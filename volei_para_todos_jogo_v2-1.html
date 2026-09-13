@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vôlei para Todos — Desafio Acessível</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:linear-gradient(135deg,#071b33,#174f70);color:#102033}
+#app{max-width:900px;margin:auto;padding:18px}.card{background:#fff;border-radius:24px;padding:25px;box-shadow:0 12px 35px #0005;min-height:620px}
+h1{font-size:32px;margin:8px 0}.subtitle{font-size:18px}.badge{display:inline-block;background:#f4c51b;padding:7px 12px;border-radius:20px;font-weight:bold}
+button{font:inherit;cursor:pointer}.menu button,.answers button,.actions button{width:100%;padding:15px;margin:7px 0;border:2px solid #174f70;border-radius:14px;background:#fff;text-align:left;transition:.15s}
+button:hover,button:focus{transform:translateY(-2px);outline:4px solid #f4c51b}.primary{background:#174f70!important;color:#fff!important;text-align:center!important}
+.progress{height:16px;background:#dfe5ea;border-radius:20px;overflow:hidden;margin:15px 0}.bar{height:100%;background:#f4c51b;transition:width .5s}
+.score{float:right;font-weight:bold}.feedback{padding:16px;border-radius:14px;margin-top:12px;font-size:17px}.good{background:#e7f7eb}.bad{background:#fde9e9}
+.scene{height:220px;background:linear-gradient(#cceeff 0 62%,#d9a85a 62%);border-radius:18px;position:relative;overflow:hidden;margin:14px 0}
+.net{position:absolute;right:22%;top:25px;height:135px;border-left:5px solid #333}.net:after{content:"";position:absolute;left:0;top:45px;width:160px;border-top:4px solid #333;transform:rotate(90deg);transform-origin:left}
+.ball{position:absolute;font-size:45px;animation:bounce 1.8s infinite ease-in-out;left:18%;top:55px}
+.player{position:absolute;font-size:55px;bottom:35px;animation:jump 1.8s infinite ease-in-out}
+.p1{left:18%}.p2{right:18%;animation-delay:.4s}
+@keyframes bounce{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translate(240px,65px) rotate(180deg)}}
+@keyframes jump{0%,100%{transform:translateY(0)}50%{transform:translateY(-28px)}}
+.confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden}.piece{position:absolute;top:-20px;font-size:24px;animation:fall 2.2s linear forwards}
+@keyframes fall{to{transform:translateY(105vh) rotate(720deg)}}
+.small{font-size:14px;color:#4d5b68}.controls{display:flex;gap:8px;flex-wrap:wrap}.controls button{padding:10px 14px;border-radius:12px;border:1px solid #aaa;background:#fff}
+.levels{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.levels button{text-align:center}
+@media(max-width:600px){h1{font-size:26px}.levels{grid-template-columns:1fr}.card{min-height:650px;padding:18px}}
+</style>
+</head>
+<body>
+<div id="app"></div><div id="confetti" class="confetti"></div>
+<script>
+const questions=[
+["Qual fundamento é usado principalmente para receber o saque? ",["Ataque","Recepção","Bloqueio","Levantamento"],1,"A recepção controla a bola após o saque."],
+["Qual fundamento normalmente prepara a bola para o atacante?",["Saque","Levantamento","Bloqueio","Defesa"],1,"O levantamento organiza a bola para o ataque."],
+["Qual ação inicia cada rally?",["Saque","Recepção","Bloqueio","Defesa"],0,"O saque inicia a disputa do rally."],
+["Quantos toques uma equipe pode usar, em regra, para devolver a bola?",["1","2","3","4"],2,"A equipe pode usar até três toques, sem contar o toque de bloqueio nessa contagem."],
+["Qual fundamento é realizado próximo à rede para impedir ou dificultar o ataque?",["Recepção","Bloqueio","Saque","Levantamento"],1,"O bloqueio é realizado junto à rede."],
+["Qual fundamento pode ser usado para enviar a bola ao campo adversário com intenção de marcar ponto?",["Ataque","Recepção","Levantamento","Passe"],0,"O ataque busca colocar a bola no campo adversário de forma ofensiva."],
+["O que acontece quando uma equipe vence o rally?",["Perde o saque","Marca um ponto","Sai da quadra","Troca de uniforme"],1,"No sistema atual, a equipe que vence o rally marca um ponto."],
+["Qual atitude favorece uma prática esportiva inclusiva?",["Excluir quem precisa de apoio","Adaptar recursos quando necessário","Usar somente comandos rápidos","Não permitir repetição"],1,"Adaptações podem ampliar a participação de todos."],
+["Qual recurso ajuda uma pessoa surda a acompanhar um vídeo?",["Legendas","Som mais alto","Tela menor","Somente música"],0,"Legendas apresentam informações sonoras também em texto."],
+["Por que não devemos usar apenas a cor para transmitir uma informação?",["Porque cores não existem","Porque algumas pessoas podem não distinguir determinadas cores","Porque deixa o jogo lento","Porque elimina as imagens"],1,"Informações importantes devem ter outras formas de identificação."],
+["Qual recurso pode ajudar uma pessoa com deficiência visual a compreender informações visuais?",["Audiodescrição","Mais cores","Texto menor","Animação sem descrição"],0,"A audiodescrição transforma informações visuais em descrição sonora."],
+["Qual característica torna uma interface mais compreensível?",["Excesso de informações","Instruções claras e organização simples","Comandos escondidos","Tempo sempre limitado"],1,"Linguagem clara e organização lógica facilitam a compreensão."],
+["Em uma situação de jogo, qual fundamento vem normalmente depois da recepção para organizar a jogada?",["Levantamento","Saque","Bloqueio","Manchete adversária"],0,"O levantamento organiza a bola para a ação ofensiva."],
+["Qual recurso favorece estudantes que precisam de mais tempo?",["Tempo flexível","Cronômetro obrigatório","Retirar instruções","Acelerar as perguntas"],0,"O tempo flexível permite que cada estudante avance em seu próprio ritmo."],
+["O que significa pensar na acessibilidade desde a origem do jogo?",["Criar primeiro e adaptar depois","Considerar diferentes formas de acesso já no planejamento","Usar somente tecnologia assistiva","Retirar desafios"],1,"A acessibilidade deve fazer parte da concepção do jogo desde o início."]
+];
+let q=0,score=0,level="Iniciante";
+
+function home(){
+document.getElementById("app").innerHTML=`<main class="card">
+<div class="scene"><div class="ball">🏐</div><div class="player p1">🏃</div><div class="player p2">🏃</div><div class="net"></div></div>
+<span class="badge">JOGO DIGITAL ACESSÍVEL</span><h1>🏐 Vôlei para Todos</h1>
+<p class="subtitle">Desafio Acessível — aprenda, responda e avance pelas fases!</p>
+<p>Um jogo educativo sobre voleibol e inclusão, criado para estudantes com diferentes formas de aprender e interagir.</p>
+<div class="levels"><button onclick="start('Iniciante')">🟢 Iniciante<br><span class="small">5 desafios</span></button><button onclick="start('Intermediário')">🟡 Intermediário<br><span class="small">10 desafios</span></button><button onclick="start('Avançado')">🔴 Avançado<br><span class="small">15 desafios</span></button></div>
+<hr><div class="controls"><button onclick="speakText('Bem-vindo ao Vôlei para Todos. Escolha um nível para começar.')">🔊 Ouvir instruções</button></div>
+</main>`;
+}
+function start(l){level=l;q=0;score=0;render()}
+function render(){
+let total=level==="Iniciante"?5:level==="Intermediário"?10:15;
+let x=questions[q%questions.length];
+document.getElementById("app").innerHTML=`<main class="card">
+<span class="badge">${level}</span><span class="score">⭐ ${score} pontos</span>
+<h1>🏐 Vôlei para Todos</h1><div class="progress"><div class="bar" style="width:${q/total*100}%"></div></div>
+<p><b>Desafio ${q+1} de ${total}</b></p><div class="scene"><div class="ball">🏐</div><div class="player p1">🏃</div><div class="player p2">🏃</div><div class="net"></div></div>
+<h2>${x[0]}</h2><div class="answers" id="answers"></div><div id="feedback" aria-live="polite"></div>
+<div class="controls"><button onclick="speakText('${x[0].replace(/'/g,"\\'")}')">🔊 Ouvir pergunta</button><button onclick="home()">🏠 Início</button></div></main>`;
+x[1].forEach((a,n)=>{let b=document.createElement("button");b.textContent=(n+1)+". "+a;b.onclick=()=>answer(n);document.getElementById("answers").appendChild(b)});
+}
+function answer(n){
+let total=level==="Iniciante"?5:level==="Intermediário"?10:15,x=questions[q%questions.length],fb=document.getElementById("feedback");
+document.querySelectorAll(".answers button").forEach(b=>b.disabled=true);
+if(n===x[2]){score++;fb.className="feedback good";fb.innerHTML="🎉 <b>Muito bem!</b> "+x[3];speakText("Resposta correta. "+x[3])}
+else{fb.className="feedback bad";fb.innerHTML="💡 <b>Vamos aprender!</b> "+x[3];speakText("Resposta incorreta. "+x[3])}
+q++;
+if(q>=total){setTimeout(finish,1700)}else{setTimeout(render,1700)}
+}
+function finish(){
+let total=level==="Iniciante"?5:level==="Intermediário"?10:15,pct=Math.round(score/total*100);
+if(pct>=70)celebrate();
+document.getElementById("app").innerHTML=`<main class="card"><div class="scene"><div class="ball">🏐</div><div class="player p1">🏆</div><div class="player p2">🏃</div><div class="net"></div></div>
+<span class="badge">FASE CONCLUÍDA</span><h1>${pct>=70?"🏆 Parabéns!":"👏 Continue praticando!"}</h1>
+<p class="subtitle">Você fez <b>${score} de ${total}</b> pontos — ${pct}% de aproveitamento.</p>
+<p>${pct>=70?"Excelente desempenho! Você está avançando nos conhecimentos sobre voleibol e inclusão.":"Cada tentativa é uma oportunidade para aprender. Jogue novamente e tente superar sua pontuação."}</p>
+<button class="primary" onclick="start('${level}')">🔄 Jogar novamente</button>
+<button onclick="home()">🏠 Voltar ao início</button></main>`;
+}
+function celebrate(){let c=document.getElementById("confetti");c.innerHTML="";for(let i=0;i<35;i++){let p=document.createElement("span");p.className="piece";p.textContent=["⭐","🏐","🎉","🏆"][Math.floor(Math.random()*4)];p.style.left=Math.random()*100+"%";p.style.animationDelay=Math.random()*.7+"s";c.appendChild(p)}setTimeout(()=>c.innerHTML="",3000)}
+function speakText(t){if("speechSynthesis"in window){speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(t);u.lang="pt-BR";speechSynthesis.speak(u)}}
+home();
+</script>
+</body></html>
